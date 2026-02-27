@@ -897,21 +897,29 @@ def home():
 
 @app.route("/analyze", methods=["POST"])
 def api_analyze():
-    data = request.get_json()
-    token = data.get("token", "bitcoin")
-    result = analyze_token(client, token)
+    try:
+        data = request.get_json()
+        token = data.get("token", "bitcoin")
+        result = analyze_token(client, token)
 
-    # Save to history if successful
-    if "error" not in result:
-        save_to_history(result)
+        # Save to history if successful
+        if "error" not in result:
+            save_to_history(result)
 
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        print(f"Analysis error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/chart/<token>")
 def api_chart(token):
-    data = get_chart_data(token, days=7)
-    return jsonify(data)
+    try:
+        data = get_chart_data(token, days=7)
+        return jsonify(data)
+    except Exception as e:
+        print(f"Chart error: {e}")
+        return jsonify([])
 
 
 @app.route("/fear-greed")
