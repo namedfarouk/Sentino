@@ -1,0 +1,6 @@
+flask
+opengradient
+requests
+python-dotenv
+python-telegram-bot
+gunicorn

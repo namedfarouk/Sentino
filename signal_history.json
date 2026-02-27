@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "symbol": "XRP",
+    "token": "ripple",
+    "price": 1.35,
+    "change_24h": -2.69,
+    "signal": "BEARISH",
+    "confidence": 85,
+    "risk": "HIGH",
+    "reasoning": "XRP is experiencing negative price momentum over both 24h and 7d periods, accompanied by an extremely low Fear & Greed Index indicating strong market fear. Trading volume is moderate but not enough to suggest a reversal.",
+    "tx_hash": "external",
+    "timestamp": "2026-02-27T22:20:30.298797"
+  },
+  {
+    "symbol": "ADA",
+    "token": "cardano",
+    "price": 0.277555,
+    "change_24h": -2.62,
+    "signal": "BEARISH",
+    "confidence": 85,
+    "risk": "HIGH",
+    "reasoning": "ADA has experienced negative price momentum over both 24h and 7d periods, with significant selling pressure indicated by a high volume relative to market cap and an Extreme Fear reading on the Fear & Greed Index.",
+    "tx_hash": "external",
+    "timestamp": "2026-02-27T22:20:08.804083"
+  },
+  {
+    "symbol": "AVAX",
+    "token": "avalanche-2",
+    "price": 8.93,
+    "change_24h": -3.47,
+    "signal": "BEARISH",
+    "confidence": 85,
+    "risk": "HIGH",
+    "reasoning": "AVAX is experiencing negative price momentum over both 24h and 7d periods, with a significant drop in the Fear & Greed Index indicating extreme fear and likely continued selling pressure.",
+    "tx_hash": "external",
+    "timestamp": "2026-02-27T22:20:00.089418"
+  }
+]
