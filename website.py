@@ -512,21 +512,45 @@ HTML = """
         }
 
         footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             border-top: 1px solid var(--border);
-            padding: 24px 40px;
+            padding: 14px 40px;
             display: flex;
-            justify-content: space-between;
-            margin-top: 60px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background: rgba(8,8,12,0.92);
+            backdrop-filter: blur(16px);
+            z-index: 100;
         }
 
-        footer span, footer a {
+        footer span {
             font-family: 'DM Mono', monospace;
             font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 0.5px;
         }
 
-        footer a { text-decoration: none; border-bottom: 1px solid var(--text-muted); }
+        footer .sep { color: var(--border); font-size: 13px; }
+        footer .brand { color: var(--text-dim); }
+        footer .brand em { font-style: normal; color: var(--accent); }
+
+        footer a {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s;
+        }
+
+        footer a:hover { opacity: 0.7; }
+        footer .og { color: var(--text-dim); }
+
+        .main { padding-bottom: 80px; }
 
         @media (max-width: 640px) {
             .hero-title { font-size: 32px; }
@@ -622,14 +646,23 @@ HTML = """
 
         <!-- History -->
         <div id="historySection" style="display:none">
-            <div class="section-label">Signal History</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:48px;margin-bottom:16px;">
+                <div class="section-label" style="margin:0">Signal History</div>
+                <button onclick="clearHistory()" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);background:var(--red-dim);border:1px solid var(--red);padding:5px 12px;border-radius:3px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Clear</button>
+            </div>
             <div id="historyList"></div>
         </div>
     </div>
 
     <footer>
-        <span>sentino. &mdash; verifiable ai</span>
-        <span>created by FK <a href="https://x.com/NamedFarouk">@NamedFarouk</a> &mdash; powered by opengradient</span>
+        <span class="brand">sentino<em>.</em></span>
+        <span class="sep">&middot;</span>
+        <span>verifiable ai</span>
+        <span class="sep">&middot;</span>
+        <span>built by</span>
+        <a href="https://x.com/NamedFarouk" target="_blank">@NamedFarouk</a>
+        <span class="sep">&middot;</span>
+        <span class="og">powered by opengradient</span>
     </footer>
 
     <script>
@@ -844,6 +877,13 @@ HTML = """
         // Init
         loadFearGreed();
         loadHistory();
+
+        async function clearHistory() {
+            if (!confirm('Clear all signal history?')) return;
+            await fetch('/history', {method: 'DELETE'});
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('historyList').innerHTML = '';
+        }
     </script>
 </body>
 </html>
@@ -883,6 +923,13 @@ def api_fear_greed():
 @app.route("/history")
 def api_history():
     return jsonify(load_history())
+
+
+@app.route("/history", methods=["DELETE"])
+def api_clear_history():
+    with open(HISTORY_FILE, "w") as f:
+        json.dump([], f)
+    return jsonify({"ok": True})
 
 
 if __name__ == "__main__":
