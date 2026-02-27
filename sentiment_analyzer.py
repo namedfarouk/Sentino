@@ -1,8 +1,8 @@
 import json
-from price_fetcher import get_crypto_data
+from price_fetcher import get_crypto_data, get_fear_greed
 from og_client import init_client, run_verifiable_analysis
 
-SYSTEM_PROMPT = """You are a crypto market analyst. Given price data,
+SYSTEM_PROMPT = """You are a crypto market analyst. Given price data and market sentiment,
 provide a structured sentiment analysis. Be concise and data-driven.
 
 Always respond in this exact JSON format:
@@ -14,8 +14,8 @@ Always respond in this exact JSON format:
   "risk_level": "LOW" or "MEDIUM" or "HIGH"
 }
 
-Base your analysis on price momentum, volume patterns, and
-market cap context. Do not provide financial advice."""
+Base your analysis on price momentum, volume patterns, market cap context,
+and the Fear & Greed Index if provided. Do not provide financial advice."""
 
 
 def analyze_token(client, token_id="bitcoin"):
@@ -25,6 +25,13 @@ def analyze_token(client, token_id="bitcoin"):
     if not price_data:
         return {"error": f"Could not fetch data for {token_id}"}
 
+    # Get Fear & Greed Index
+    fear_greed = get_fear_greed()
+
+    fg_text = ""
+    if fear_greed:
+        fg_text = f"\nFear & Greed Index: {fear_greed['value']}/100 ({fear_greed['label']})"
+
     prompt = f"""Analyze this crypto data and provide your sentiment signal:
 
 Token: {price_data['symbol']}
@@ -32,7 +39,7 @@ Current Price: ${price_data['price_usd']:,.2f}
 24h Change: {price_data['change_24h_pct']}%
 7d Change: {price_data['change_7d_pct']}%
 Market Cap: ${price_data['market_cap']:,.0f}
-24h Volume: ${price_data['volume_24h']:,.0f}
+24h Volume: ${price_data['volume_24h']:,.0f}{fg_text}
 
 Respond with JSON only."""
 
@@ -47,7 +54,7 @@ Respond with JSON only."""
     except json.JSONDecodeError:
         signal = {"signal": "PARSE_ERROR", "raw_response": response}
 
-    return {
+    result = {
         "price_data": price_data,
         "signal": signal,
         "verification": {
@@ -56,6 +63,11 @@ Respond with JSON only."""
             "infrastructure": "OpenGradient Verifiable Inference"
         }
     }
+
+    if fear_greed:
+        result["fear_greed"] = fear_greed
+
+    return result
 
 
 if __name__ == "__main__":

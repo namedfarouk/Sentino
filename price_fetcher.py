@@ -36,8 +36,6 @@ TICKER_MAP = {
     "ftm": "fantom",
     "fil": "filecoin",
     "grt": "the-graph",
-    "allo": "allora",
-    "zama": "zama",
 }
 
 
@@ -109,8 +107,62 @@ def get_crypto_data(token_id="bitcoin"):
         return None
 
 
+def get_chart_data(token_id="bitcoin", days=7):
+    """Fetch price history for charts."""
+    resolved = resolve_token(token_id)
+    time.sleep(1.5)
+
+    url = f"https://api.coingecko.com/api/v3/coins/{resolved}/market_chart"
+    params = {
+        "vs_currency": "usd",
+        "days": days,
+        "interval": "daily" if days > 1 else "hourly"
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        prices = data.get("prices", [])
+        return [{"time": p[0], "price": round(p[1], 2)} for p in prices]
+
+    except requests.RequestException as e:
+        print(f"  Error fetching chart data: {e}")
+        return []
+
+
+def get_fear_greed():
+    """Fetch the Crypto Fear & Greed Index."""
+    try:
+        url = "https://api.alternative.me/fng/?limit=1"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("data"):
+            entry = data["data"][0]
+            return {
+                "value": int(entry["value"]),
+                "label": entry["value_classification"],
+                "timestamp": entry["timestamp"]
+            }
+        return None
+
+    except requests.RequestException as e:
+        print(f"  Error fetching Fear & Greed: {e}")
+        return None
+
+
 if __name__ == "__main__":
     data = get_crypto_data("btc")
     if data:
         for key, value in data.items():
             print(f"  {key}: {value}")
+
+    fg = get_fear_greed()
+    if fg:
+        print(f"\n  Fear & Greed: {fg['value']} ({fg['label']})")
+
+    chart = get_chart_data("btc", 7)
+    print(f"\n  Chart data points: {len(chart)}")
