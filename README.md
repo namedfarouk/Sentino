@@ -1,4 +1,4 @@
-# Senti-Bot
+# Sentino
 
 AI-powered crypto sentiment analysis bot built on OpenGradient's verifiable inference network.
 
