@@ -932,8 +932,10 @@ def api_clear_history():
     return jsonify({"ok": True})
 
 
+# Initialize client for both gunicorn and direct run
+client = init_client()
+
 if __name__ == "__main__":
-    client = init_client()
     print("\n  Sentino Dashboard: http://localhost:8080")
     print("  Open this link in your browser!\n")
     app.run(debug=False, port=8080, host="0.0.0.0")
